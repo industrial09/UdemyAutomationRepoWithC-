@@ -6,11 +6,15 @@ namespace EAEmployeeTest.Pages
 {
     class LoginPage : BasePage
     {
-        IWebElement txtUserName => DriverContext.Driver.FindElement(By.Id("UserName"));
+        public LoginPage(ParallelConfig parallelConfig) : base(parallelConfig)
+        {
+        }
 
-        IWebElement txtPassword => DriverContext.Driver.FindElement(By.Id("Password"));
+        IWebElement txtUserName => _parallelConfig.Driver.FindElement(By.Id("UserName"));
 
-        IWebElement btnLogin => DriverContext.Driver.FindElement(By.CssSelector("input.btn"));
+        IWebElement txtPassword => _parallelConfig.Driver.FindElement(By.Id("Password"));
+
+        IWebElement btnLogin => _parallelConfig.Driver.FindElement(By.CssSelector("input.btn"));
 
 
         public void Login(string userName, string password)
@@ -23,7 +27,7 @@ namespace EAEmployeeTest.Pages
         public HomePage ClickLoginButton()
         {
             btnLogin.Submit();
-            return GetInstance<HomePage>();
+            return new HomePage(_parallelConfig);
         }
 
 

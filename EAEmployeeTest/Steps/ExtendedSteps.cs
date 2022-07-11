@@ -9,11 +9,17 @@ namespace EAEmployeeTest.Steps
     [Binding]
     internal class ExtendedSteps : BaseStep
     {
+        private ParallelConfig _parallelConfig;
+        public ExtendedSteps(ParallelConfig parallelConfig) : base(parallelConfig)
+        {
+            _parallelConfig = parallelConfig;
+        }
+
         [Given(@"I have navigated to the application")]
         public void GivenIHaveNavigatedToTheApplication()
         {
-            NaviateSite();
-            CurrentPage = GetInstance<HomePage>();
+            _parallelConfig.Driver.Navigate().GoToUrl(Settings.AUT);
+            _parallelConfig.CurrentPage = new HomePage(_parallelConfig);
         }
 
 
@@ -27,35 +33,33 @@ namespace EAEmployeeTest.Steps
         [Given(@"I see application opened")]
         public void GivenISeeApplicationOpened()
         {
-            CurrentPage.As<HomePage>().CheckIfLoginExist();
+            _parallelConfig.CurrentPage.As<HomePage>().CheckIfLoginExist();
         }
 
         [Then(@"I click (.*) link")]
         public void ThenIClickLink(string linkName)
         {
             if (linkName == "login")
-                CurrentPage = CurrentPage.As<HomePage>().ClickLogin();
+                _parallelConfig.CurrentPage = _parallelConfig.CurrentPage.As<HomePage>().ClickLogin();
             else if (linkName == "employeeList")
-                CurrentPage = CurrentPage.As<HomePage>().ClickEmployeeList();
+                _parallelConfig.CurrentPage = _parallelConfig.CurrentPage.As<HomePage>().ClickEmployeeList();
         }
 
         [Then(@"I click (.*) button")]
         public void ThenIClickButton(string buttonName)
         {
             if (buttonName == "login")
-                CurrentPage = CurrentPage.As<LoginPage>().ClickLoginButton();
+                _parallelConfig.CurrentPage = _parallelConfig.CurrentPage.As<LoginPage>().ClickLoginButton();
             else if (buttonName == "createnew")
-                CurrentPage = CurrentPage.As<EmployeeListPage>().ClickCreateNew();
+                _parallelConfig.CurrentPage = _parallelConfig.CurrentPage.As<EmployeeListPage>().ClickCreateNew();
             else if (buttonName == "create")
-                CurrentPage = CurrentPage.As<CreateEmployeePage>().ClickCreateButton();
+                _parallelConfig.CurrentPage = _parallelConfig.CurrentPage.As<CreateEmployeePage>().ClickCreateButton();
         }
 
         [Then(@"I click log off")]
         public void ThenIClickLogOff()
         {
-            CurrentPage.As<EmployeeListPage>().ClickLogoff();
+            _parallelConfig.CurrentPage.As<EmployeeListPage>().ClickLogoff();
         }
-
-
     }
 }

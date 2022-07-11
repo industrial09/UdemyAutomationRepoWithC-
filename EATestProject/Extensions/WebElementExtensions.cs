@@ -10,7 +10,6 @@ namespace EAAutoFramework.Extensions
 {
     public static class WebElementExtensions
     {
-
         public static string GetSelectedDropDown(this IWebElement element)
         {
             SelectElement ddl = new SelectElement(element);
@@ -36,11 +35,11 @@ namespace EAAutoFramework.Extensions
         }
 
 
-        public static void Hover(this IWebElement element)
+        /*public static void Hover(this IWebElement element)
         {
             Actions actions = new Actions(DriverContext.Driver);
             actions.MoveToElement(element).Perform();
-        }
+        }*/
 
 
         public static void AssertElementPresent(this IWebElement element)

@@ -9,19 +9,12 @@ namespace EAAutoFramework.Base
 {
     public class Browser
     {
-        private readonly IWebDriver _driver;
-
-        public Browser(IWebDriver driver)
-        {
-            _driver = driver;
+        private ParallelConfig _parallelConfig;
+        public Browser(ParallelConfig parallelConfig) { 
+            _parallelConfig = parallelConfig;
         }
 
         public BrowserType Type { get; set; }
-
-        public void GoToUrl(string url)
-        {
-            DriverContext.Driver.Url = url;
-        }
 
     }
 

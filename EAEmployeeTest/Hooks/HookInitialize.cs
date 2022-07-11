@@ -16,8 +16,19 @@ namespace EAEmployeeTest.Hooks
         //Create html report
         static ExtentHtmlReporter extentHtmlReporter;
         static ExtentReports extentReports;
-        static ExtentTest featureName;
+        ExtentTest featureName;
         ExtentTest scenario;
+
+        private ParallelConfig _parallelConfig;
+        private FeatureContext _featureContext;
+        private ScenarioContext _scenarioContext;
+
+        public HookInitialize(ParallelConfig parallelConfig, FeatureContext featureContext, ScenarioContext scenarioContext) : base(parallelConfig)
+        {
+            _parallelConfig = parallelConfig;
+            _featureContext = featureContext;
+            _scenarioContext = scenarioContext;
+        }
 
         [BeforeTestRun]
         public static void TestInitalize()
@@ -28,53 +39,46 @@ namespace EAEmployeeTest.Hooks
             //Attach report to ExtentReport object
             extentReports = new ExtentReports();
             extentReports.AttachReporter(extentHtmlReporter);
-            InitializeSettings();
-            Settings.ApplicationCon = Settings.ApplicationCon.DBConnect(Settings.AppConnectionString);
-        }
-        [BeforeFeature]
-        public static void beforeFeature() {
-            featureName = extentReports.CreateTest<Feature>(FeatureContext.Current.FeatureInfo.Title);
         }
 
         [AfterScenario]
         public void TestStop()
         {
-            //DriverContext.Driver.Quit();
+            _parallelConfig.Driver.Quit();
         }
 
         [AfterStep]
         public void afterStep() {
-            var stepType = ScenarioStepContext.Current.StepInfo.StepDefinitionType.ToString();
-            /*PropertyInfo pInfo = typeof(ScenarioContext).GetProperty("TestStatus", BindingFlags.Instance | BindingFlags.NonPublic);
-            MethodInfo getter = pInfo.GetGetMethod(nonPublic: true);
-            object TestResult = getter.Invoke(ScenarioContext.Current, null);*/
+            var stepType = _scenarioContext.StepContext.StepInfo.StepDefinitionType.ToString();
 
-            if (ScenarioContext.Current.TestError == null)
+            if (_scenarioContext.TestError == null)
             {
-                if (stepType == "Given") scenario.CreateNode<Given>(ScenarioStepContext.Current.StepInfo.Text);
-                else if (stepType == "When") scenario.CreateNode<When>(ScenarioStepContext.Current.StepInfo.Text);
-                else if (stepType == "Then") scenario.CreateNode<Then>(ScenarioStepContext.Current.StepInfo.Text);
-                else if (stepType == "And") scenario.CreateNode<And>(ScenarioStepContext.Current.StepInfo.Text);
+                if (stepType == "Given")
+                    scenario.CreateNode<Given>(_scenarioContext.StepContext.StepInfo.Text);
+                else if (stepType == "When")
+                    scenario.CreateNode<When>(_scenarioContext.StepContext.StepInfo.Text);
+                else if (stepType == "Then")
+                    scenario.CreateNode<Then>(_scenarioContext.StepContext.StepInfo.Text);
+                else if (stepType == "And")
+                    scenario.CreateNode<And>(_scenarioContext.StepContext.StepInfo.Text);
             }
-            else if (ScenarioContext.Current.TestError != null) {
-                if (stepType == "Given") scenario.CreateNode<Given>(ScenarioStepContext.Current.StepInfo.Text).Fail(ScenarioContext.Current.TestError.InnerException);
-                else if (stepType == "When") scenario.CreateNode<When>(ScenarioStepContext.Current.StepInfo.Text).Fail(ScenarioContext.Current.TestError.InnerException);
-                else if (stepType == "Then") scenario.CreateNode<Then>(ScenarioStepContext.Current.StepInfo.Text).Fail(ScenarioContext.Current.TestError.InnerException);
-                else if (stepType == "And") scenario.CreateNode<And>(ScenarioStepContext.Current.StepInfo.Text).Fail(ScenarioContext.Current.TestError.InnerException);
-            }
-            //Pending Status
-            /*if (TestResult.ToString() == "StepDefinitionPending")
+            else if (_scenarioContext.TestError != null)
             {
-                if (stepType == "Given") scenario.CreateNode<Given>(ScenarioStepContext.Current.StepInfo.Text).Skip("Step Definition Pending");
-                else if (stepType == "When") scenario.CreateNode<When>(ScenarioStepContext.Current.StepInfo.Text).Skip("Step Definition Pending");
-                else if (stepType == "Then") scenario.CreateNode<Then>(ScenarioStepContext.Current.StepInfo.Text).Skip("Step Definition Pending");
-                else if (stepType == "And") scenario.CreateNode<And>(ScenarioStepContext.Current.StepInfo.Text).Skip("Step Definition Pending");
-            }*/
+                if (stepType == "Given")
+                    scenario.CreateNode<Given>(_scenarioContext.StepContext.StepInfo.Text).Fail(_scenarioContext.TestError.InnerException);
+                else if (stepType == "When")
+                    scenario.CreateNode<When>(_scenarioContext.StepContext.StepInfo.Text).Fail(_scenarioContext.TestError.InnerException);
+                else if (stepType == "Then")
+                    scenario.CreateNode<Then>(_scenarioContext.StepContext.StepInfo.Text).Fail(_scenarioContext.TestError.Message);
+            }
         }
 
         [BeforeScenario]
         public void beforeScenario() {
-            scenario = extentReports.CreateTest<Scenario>(ScenarioContext.Current.ScenarioInfo.Title);
+            InitializeSettings();
+            Settings.ApplicationCon = Settings.ApplicationCon.DBConnect(Settings.AppConnectionString);
+            featureName = extentReports.CreateTest<Feature>(_featureContext.FeatureInfo.Title);
+            scenario = featureName.CreateNode<Scenario>(_scenarioContext.ScenarioInfo.Title);
         }
 
         [AfterTestRun]

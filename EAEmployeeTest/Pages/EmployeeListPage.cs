@@ -3,20 +3,26 @@ using OpenQA.Selenium;
 
 namespace EAEmployeeTest.Pages
 {
-    internal class EmployeeListPage : BasePage
+    public class EmployeeListPage : BasePage
     {
-        IWebElement txtSearch => DriverContext.Driver.FindElement(By.Name("searchTerm"));
+        //We only need to set the constructor with Context Injection class (ParallelConfig in this case)
+        //to initiliaze the Driver variable
+        public EmployeeListPage(ParallelConfig parallelConfig) : base(parallelConfig)
+        {
+        }
 
-        IWebElement lnkCreateNew => DriverContext.Driver.FindElement(By.LinkText("Create New"));
+        IWebElement txtSearch => _parallelConfig.Driver.FindElement(By.Name("searchTerm"));
 
-        IWebElement tblEmployeeList => DriverContext.Driver.FindElement(By.ClassName("table"));
+        IWebElement lnkCreateNew => _parallelConfig.Driver.FindElement(By.LinkText("Create New"));
 
-        IWebElement lnkLogoff => DriverContext.Driver.FindElement(By.LinkText("Log off"));
+        IWebElement tblEmployeeList => _parallelConfig.Driver.FindElement(By.ClassName("table"));
+
+        IWebElement lnkLogoff => _parallelConfig.Driver.FindElement(By.LinkText("Log off"));
 
         public CreateEmployeePage ClickCreateNew()
         {
             lnkCreateNew.Click();
-            return new CreateEmployeePage();
+            return new CreateEmployeePage(_parallelConfig);
         }
 
         public IWebElement GetEmployeeList() => tblEmployeeList;

@@ -5,13 +5,12 @@ namespace EAAutoFramework.Base
 {
     public class Base
     {
-        public BasePage CurrentPage
-        {
-            get => (BasePage)ScenarioContext.Current["currentPage"];
-            set => ScenarioContext.Current["currentPage"] = value;
+        protected ParallelConfig _parallelConfig;
+        public Base(ParallelConfig parallelConfig) { 
+            _parallelConfig = parallelConfig;
         }
 
-        protected TPage GetInstance<TPage>() where TPage : BasePage, new()
+        public TPage GetInstance<TPage>() where TPage : BasePage, new()
         {
             return (TPage) Activator.CreateInstance(typeof(TPage));
         }

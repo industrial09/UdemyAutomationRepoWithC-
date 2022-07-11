@@ -4,15 +4,19 @@ using OpenQA.Selenium;
 
 namespace EAEmployeeTest.Pages
 {
-    internal class HomePage : BasePage
+    public class HomePage : BasePage
     {
-        IWebElement lnkLogin => DriverContext.Driver.FindElement(By.LinkText("Login"));
+        public HomePage(ParallelConfig parallelConfig) : base(parallelConfig)
+        {
+        }
 
-        IWebElement lnkEmployeeList => DriverContext.Driver.FindElement(By.LinkText("Employee List"));
+        IWebElement lnkLogin => _parallelConfig.Driver.FindElement(By.LinkText("Login"));
 
-        IWebElement lnkLoggedInUser => DriverContext.Driver.FindElement(By.XPath("//a[@title='Manage']"));
+        IWebElement lnkEmployeeList => _parallelConfig.Driver.FindElement(By.LinkText("Employee List"));
 
-        IWebElement lnkLogoff => DriverContext.Driver.FindElement(By.LinkText("Log off"));
+        IWebElement lnkLoggedInUser => _parallelConfig.Driver.FindElement(By.XPath("//a[@title='Manage']"));
+
+        IWebElement lnkLogoff => _parallelConfig.Driver.FindElement(By.LinkText("Log off"));
 
 
         internal void CheckIfLoginExist() => lnkLogin.AssertElementPresent();
@@ -21,7 +25,7 @@ namespace EAEmployeeTest.Pages
         internal LoginPage ClickLogin()
         {
             lnkLogin.Click();
-            return GetInstance<LoginPage>();
+            return new LoginPage(_parallelConfig);
         }
 
         internal string GetLoggedInUser() => lnkLoggedInUser.GetLinkText();
@@ -29,13 +33,13 @@ namespace EAEmployeeTest.Pages
         public EmployeeListPage ClickEmployeeList()
         {
             lnkEmployeeList.Click();
-            return GetInstance<EmployeeListPage>();
+            return new EmployeeListPage(_parallelConfig);
         }
 
-        public LoginPage ClickLogOff()
+        internal LoginPage ClickLogOff()
         {
             lnkLogoff.Click();
-            return GetInstance<LoginPage>();
+            return new LoginPage(_parallelConfig);
         }
     }
 }

@@ -5,12 +5,19 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Chrome;
 using System.IO;
 using TechTalk.SpecFlow;
+using OpenQA.Selenium.Remote;
+using OpenQA.Selenium;
+using System;
 
 namespace EAAutoFramework.Base
 {
     public abstract class TestInitializeHook : Steps
     {
-        public static void InitializeSettings()
+        private ParallelConfig _parallelConfig;
+        public TestInitializeHook(ParallelConfig parallelConfig) { 
+            this._parallelConfig = parallelConfig;
+        }
+        public void InitializeSettings()
         {
             //Set all the settings for framework
             ConfigReader.SetFrameworkSettings();
@@ -25,35 +32,26 @@ namespace EAAutoFramework.Base
 
         }
 
-        private static void OpenBrowser(BrowserType browserType = BrowserType.FireFox)
+        private void OpenBrowser(BrowserType browserType = BrowserType.FireFox)
         {
+            //DesiredCapabilites is a must when using Selenium Grid for Parallel execution
+            DesiredCapabilities dc = new DesiredCapabilities();
             switch (browserType)
             {
                 case BrowserType.InternetExplorer:
-                    DriverContext.Driver = new InternetExplorerDriver();
-                    DriverContext.Browser = new Browser(DriverContext.Driver);
+                    //TODO
                     break;
                 case BrowserType.FireFox:
+                    dc.SetCapability(CapabilityType.BrowserName, "firefox");
+                    dc.SetCapability(CapabilityType.PlatformName, Platform.CurrentPlatform);
                     var binary = new FirefoxBinary(@"C:\Program Files (x86)\Mozilla Firefox\firefox.exe");
                     var profile = new FirefoxProfile();
-                    DriverContext.Driver = new FirefoxDriver(binary, profile);
-                    DriverContext.Browser = new Browser(DriverContext.Driver);
                     break;
                 case BrowserType.Chrome:
-                    DriverContext.Driver = new ChromeDriver();
-                    DriverContext.Browser = new Browser(DriverContext.Driver);
+                    dc.SetCapability(CapabilityType.BrowserName, "chrome");
                     break;
             }
-
+            _parallelConfig.Driver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), dc);
         }
-
-        public virtual void NaviateSite()
-        {
-            DriverContext.Browser.GoToUrl(Settings.AUT);
-            LogHelpers.Write("Opened the browser !!!");
-        }
-
-
-
     }
 }
