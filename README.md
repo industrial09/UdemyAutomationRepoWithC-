@@ -17,3 +17,5 @@ java -jar seleniumserver_Name.jar -role hub
 java -jar selenium_serverName.jar -role webdriver -hub http://<ip_ofSeleniumHub>:4444/grid/register -port 5556
 
 note: Seems like this only works for version 3 of Selenium 3.11.0 selenium-server works fine
+
+CODE DEVELOPED by Udemy teacher: https://github.com/executeautomation/SeleniumWithSpecflow
